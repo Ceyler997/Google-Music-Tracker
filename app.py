@@ -1,6 +1,6 @@
+import configparser
 from gmusicapi import Mobileclient
 from time_acc import TimeAcc
-import configparser
 
 print('Start')
 parser = configparser.ConfigParser()
@@ -33,8 +33,26 @@ print('Signed in successfully')
 
 library = api.get_all_songs()
 acc = TimeAcc()
+genreStatistic = dict();
+genreStatistic['No genre'] = 0
+
 for song in library:
     acc.add(int(song['durationMillis']) * song['playCount'])
+    if 'genre' in song and song['genre'] is not '':
+        if song['genre'] in genreStatistic:
+            genreStatistic[song['genre']] += 1
+        else:
+            genreStatistic[song['genre']] = 1
+    else:
+        genreStatistic['No genre'] += 1
 
 print('You listened to music for:')
 print(acc)
+
+sGenreStatistic = [(genre, genreStatistic[genre]) for genre in sorted(genreStatistic, key=genreStatistic.get, reverse=True)]
+
+print('Genre statistic:')
+total = len(library)/100
+for genre, num in sGenreStatistic:
+    print(genre, ': ', num, ' songs, ', "%0.2f" % (num/total), '% from total amount', sep='',)
+print()
