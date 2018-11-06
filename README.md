@@ -8,4 +8,4 @@ To use, add config.ini file in script folder with login and password:</br>
 login = ...</br>
 password = ...</br>
 
-Use [app password](myaccount.google.com/apppasswords), if you are using two-step verification.
+Use [app password](https://myaccount.google.com/apppasswords), if you are using two-step verification.
