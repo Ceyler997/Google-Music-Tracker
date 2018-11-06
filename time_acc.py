@@ -1,15 +1,21 @@
+'''Time accumulator class'''
 
-def upd(smaller_val, larger_val, edge):
-    if smaller_val >= edge:
-        larger_val += smaller_val // edge
-        smaller_val = smaller_val % edge
+
+def upd(smaller_val, larger_val, threshold):
+    '''
+    Increments larger value in smaller_val // threshold times
+    and decreases smaller_val on a corresponding value'''
+    if smaller_val >= threshold:
+        larger_val += smaller_val // threshold
+        smaller_val = smaller_val % threshold
 
     return smaller_val, larger_val
 
 
 class TimeAcc:
+    '''Class for accumulating time'''
     def __init__(self):
-        self.ms = 0
+        self.mls = 0
         self.sec = 0
         self.min = 0
         self.hours = 0
@@ -17,9 +23,10 @@ class TimeAcc:
         self.years = 0
 
     def add(self, acc_ms):
-        self.ms += acc_ms
+        '''Adds acc_ms milliseconds to the accumulated time'''
+        self.mls += acc_ms
 
-        (self.ms, self.sec) = upd(self.ms, self.sec, 1000)
+        (self.mls, self.sec) = upd(self.mls, self.sec, 1000)
         (self.sec, self.min) = upd(self.sec, self.min, 60)
         (self.min, self.hours) = upd(self.min, self.hours, 60)
         (self.hours, self.days) = upd(self.hours, self.days, 24)
@@ -41,12 +48,12 @@ class TimeAcc:
         seconds = (minutes % 1) * 60 + self.sec
         minutes = int(minutes // 1)
 
-        ms = (seconds % 1) * 1000 + self.ms
+        mls = (seconds % 1) * 1000 + self.mls
         seconds = int(seconds // 1)
 
-        ms = round(ms)
+        mls = round(mls)
 
-        (ms, seconds) = upd(ms, seconds, 1000)
+        (mls, seconds) = upd(mls, seconds, 1000)
         (seconds, minutes) = upd(seconds, minutes, 60)
         (minutes, hours) = upd(minutes, hours, 60)
         (hours, days) = upd(hours, days, 24)
@@ -59,11 +66,12 @@ class TimeAcc:
         result += 'Hours: ' + str(hours) + '\n'
         result += 'Minutes: ' + str(minutes) + '\n'
         result += 'Seconds: ' + str(seconds) + '\n'
-        result += 'Ms: ' + str(ms) + '\n'
+        result += 'Ms: ' + str(mls) + '\n'
         return result
 
-    def clear(self):
-        self.ms = 0
+    def reset(self):
+        '''Resets accumulator back to zero'''
+        self.mls = 0
         self.sec = 0
         self.min = 0
         self.hours = 0
