@@ -1,0 +1,10 @@
+# python files
+__pycache__
+
+# IDE files
+.idea
+.vscode
+
+# App files
+config.ini
+Library
