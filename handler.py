@@ -46,6 +46,7 @@ class LibraryHandler:
         Returns genre library statistic in form of dictionary
         <genre, amount_of_songs> and total amount of songs
         '''
+        # todo: sort by popularity
         lib_stat = dict()
         total = len(self.library)
 
