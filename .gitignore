@@ -1,10 +1,15 @@
 # python files
 __pycache__
 
+# Virtual evironment files
+venv
+
 # IDE files
 .idea
 .vscode
+*.code-workspace
 
 # App files
 config.ini
 Library
+Auth

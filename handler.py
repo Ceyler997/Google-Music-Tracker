@@ -1,6 +1,34 @@
 '''File for library handler class'''
 from datetime import timedelta
+import json
 
+
+class LibHandler:
+    '''Class to work with music library'''
+
+    def __init__(self, songs, out_file_path):
+        self.uploaded_songs = list(map(self.convert_song, songs))
+        self.uploaded_songs.sort(key=lambda song: song['album'])
+        self.out_file_path = out_file_path
+
+    def update_lib_file(self):
+        '''Updates file with songs library'''
+        with open(self.out_file_path + '.txt', 'w') as out_txt:
+            for song in self.uploaded_songs:
+                out_txt.write(f"'{song['title']}' FROM '{song['album']}' BY '{song['artist']}'\n")
+
+        with open(self.out_file_path, 'w') as out_file:
+            json.dump(self.uploaded_songs, out_file)
+
+    @staticmethod
+    def convert_song(song_info):
+        '''Converts songs info from API to the internal format'''
+        return {
+            'id': song_info['id'],
+            'title': song_info['title'],
+            'album': song_info['album'],
+            'artist': song_info['artist']
+        }
 
 class LibraryHandler:
     '''Class to work with music library'''

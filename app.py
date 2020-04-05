@@ -1,41 +1,52 @@
 '''App for collecting statistig from Google Music'''
-from gmusicapi import Mobileclient
+import sys
+import logging
+from gmusicapi import Musicmanager
 from configer import AppSetup
-from handler import LibraryHandler
+from handler import LibHandler
 
-print('Start')
+logging.info('App start')
 
 SETUP = AppSetup('config.ini')
-if not SETUP:
-    exit(-1)
+API = Musicmanager()
 
-API = Mobileclient()
-LOGIN, PASSWORD = SETUP.get_login_info()
-LOGIN_RESULT = API.login(LOGIN, PASSWORD, Mobileclient.FROM_MAC_ADDRESS)
+if not SETUP:
+    API.perform_oauth(SETUP.id_file_path, True)
+
+LOGIN_RESULT = API.login(SETUP.id_file_path)
 
 if not LOGIN_RESULT:
-    print("Can't sign you in. Please, use app specific password in case \
-          2-factor authentication")
-    exit(-1)
+    logging.error("Login failed")
+    sys.exit(-1)
 
-print('Signed in successfully')
+logging.info('Signed in successfully')
 
-LIBRARY = API.get_all_songs()
-if not LIBRARY:
-    print("Library is empty")
-    exit(0)
+UPLOADED_SONGS = API.get_uploaded_songs()
+UPLOADED_HANDLER = LibHandler(UPLOADED_SONGS, SETUP.out_dir_path + 'uploaded')
+UPLOADED_HANDLER.update_lib_file()
 
-HANDLER = LibraryHandler(LIBRARY)
+PURCHASED_SONGS = API.get_purchased_songs()
+PURCHASED_HANDLER = LibHandler(PURCHASED_SONGS, SETUP.out_dir_path + 'purchased')
+PURCHASED_HANDLER.update_lib_file()
 
-HANDLER.update_lib_file(SETUP.get_out_file())
+API.logout()
 
-print("You've listened to music for", HANDLER.get_playing_time())
+# LIBRARY = API.get_all_songs()
+# if not LIBRARY:
+#     print("Library is empty")
+#     sys.exit()
 
-print("Genre statistic:")
-GENRE_SONG_STAT, TOTAL_SONGS = HANDLER.get_genre_songs_statistic()
-for genre in GENRE_SONG_STAT:
-    play_count = GENRE_SONG_STAT[genre]
-    # convert to int to get rid of frac part and then convert to string
-    percentage = play_count/TOTAL_SONGS * 100
-    percentage = f"{percentage:2.2}%"
-    print(genre, play_count, percentage, sep='\t')
+# HANDLER = LibraryHandler(LIBRARY)
+
+# HANDLER.update_lib_file(SETUP.get_out_file())
+
+# print("You've listened to music for", HANDLER.get_playing_time())
+
+# print("Genre statistic:")
+# GENRE_SONG_STAT, TOTAL_SONGS = HANDLER.get_genre_songs_statistic()
+# for genre in GENRE_SONG_STAT:
+#     play_count = GENRE_SONG_STAT[genre]
+#     # convert to int to get rid of frac part and then convert to string
+#     percentage = play_count/TOTAL_SONGS * 100
+#     percentage = f"{percentage:2.2}%"
+#     print(genre, play_count, percentage, sep='\t')

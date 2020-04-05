@@ -1,47 +1,36 @@
 '''Class holder'''
 import configparser
+import logging
+from os import path
 
 
 class AppSetup:
     '''Class for setup the tracker'''
 
-    valid = False
-    login = ''
-    password = ''
-
-    out_file_path = 'Library/lib.json'
-
     def __init__(self, setup_file_name):
+        self.id_file_path = "Auth/id"
+        self.out_dir_path = "Library/"
+
         parser = configparser.ConfigParser()
 
-        if not parser.read(setup_file_name):
-            print("Can't open setup file", setup_file_name)
-            return
+        if parser.read(setup_file_name):
+            # Setup account data
+            try:
+                self.id_file_path = parser['Login']['id file']
+            except KeyError:
+                logging.warning("ID file path is missing, default path will be used instead")
 
-        # Setup account data
-        try:
-            self.login = parser['Account data']['login']
-            self.password = parser['Account data']['password']
-        except KeyError as error:
-            print("Can't setup the app", error)
+            # Setup output file
+            try:
+                self.out_dir_path = parser['Output']['file path']
+            except KeyError:
+                logging.error("Out file path is missing, default path will be used instead")
+        else:
+            logging.warning("Can't open setup file %s, default setup will be used", setup_file_name)
+
+        #todo: make sure that directories exists
 
         self.valid = True
 
-        # Setup output file
-        try:
-            self.out_file_path = parser['Output']['file path']
-        except KeyError:
-            pass
-
     def __bool__(self):
-        return self.valid
-
-    def get_login_info(self):
-        '''Returns [login, password] pair, if is valid, None otherwise'''
-        if self.valid:
-            return self.login, self.password
-        return None
-
-    def get_out_file(self):
-        '''Returns path to the output file default or from config, if there is'''
-        return self.out_file_path
+        return path.isfile(self.id_file_path) and path.getsize(self.id_file_path) > 0
